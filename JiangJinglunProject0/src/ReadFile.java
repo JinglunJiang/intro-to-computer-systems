@@ -4,6 +4,12 @@ import java.io.FileNotFoundException; // Import this class to handle errors
 import java.io.IOException; // Import the IOException class to handle errors
 import java.util.Scanner; // Import the Scanner class to read text files
 
+/*
+A program that can take an command line argument as a path to the input file,
+write the same content to an output file to the same path,
+strip the leading spaces,
+and strip all the comments inside the original file.
+*/
 public class ReadFile{
   public static void main(String args[]){
     if (args.length != 1){ // Check if the number of input arguments is correct.
@@ -18,8 +24,17 @@ public class ReadFile{
       // Create a scanner for reading the input file, and a writer to write to the new output file
       boolean insideMultiLineComment = false; // A flag used to check if a line is currently inside a comment
       while (myReader.hasNextLine()){
-        String data = myReader.nextLine().replaceAll("//.*", "").stripLeading();
-        if (data == ""){ // Skip the current line from writing if it is blank after stripping
+        String data = myReader.nextLine();
+        if (data.contains("/*")){ // Check if it is a start line of the multi-line comment
+          data = data.replaceAll("/\\*.*", "");
+          insideMultiLineComment = true; 
+        }
+        if (data.contains("*/")){ // Check if it is an end line of the multi-line comment
+          data = data.replaceAll(".*\\*/", "");
+          insideMultiLineComment = false;
+        }
+        data = data.replaceAll("//.*", "").stripLeading(); // Strip the single line comments and leading spaces
+        if (data.equals("") || insideMultiLineComment){ // Skip the current line from writing if it is blank after stripping
           continue;
         }
         myWriter.write(data);
