@@ -33,7 +33,7 @@ public class ReadFile{
           data = data.replaceAll(".*\\*/", "");
           insideMultiLineComment = false;
         }
-        data = data.replaceAll("//.*", "").stripLeading(); // Strip the single line comments and leading spaces
+        data = data.replaceAll("//.*", "").replaceAll("^\\s+", ""); // Strip the single line comments and leading spaces
         if (data.equals("") || insideMultiLineComment){ // Skip the current line from writing if it is blank after stripping
           continue;
         }
