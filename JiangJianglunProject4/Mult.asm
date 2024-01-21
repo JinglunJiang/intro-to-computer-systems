@@ -16,19 +16,27 @@ M=D
 
 //Loop until a <= 0
 (LOOP)
+    //The ending condition set
     @a
     D=M
     @END
     D;JLE
+
+    //Increment value at R2
     @b
     D=M
     @2
     M=M+D
+
+    //Decrement value at a
     @a
     M=M-1
+
+    //Return back to the start of the loop
     @LOOP
     0;JMP
 
 (END)
+    //The infinite loop
     @END
     0;JMP
