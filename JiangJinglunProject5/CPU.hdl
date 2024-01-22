@@ -50,7 +50,7 @@ CHIP CPU {
     DRegister(in=ALUoutput, load=loadD, out=outD);
 
     // Implement the ALU 
-    ALU(x=outD, y=AM, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=ALUoutput, ng=ng, zr=zr);
+    ALU(x=outD, y=AM, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=ALUoutput, out=outM, ng=ng, zr=zr);
 
     // writeM
     And(a=instruction[3], b=instruction[15], out=writeM);
