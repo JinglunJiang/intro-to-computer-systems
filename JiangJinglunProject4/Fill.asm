@@ -4,12 +4,13 @@
 // File name: projects/04/Fill.asm
 
 // Runs an infinite loop that listens to the keyboard input.
-// When a key is pressed (any key), the program blackens the screen
-// by writing 'black' in every pixel;
+// When a key is pressed (any key), the program blackens the screen,
+// i.e. writes "black" in every pixel;
 // the screen should remain fully black as long as the key is pressed. 
-// When no key is pressed, the program clears the screen by writing
-// 'white' in every pixel;
+// When no key is pressed, the program clears the screen, i.e. writes
+// "white" in every pixel;
 // the screen should remain fully clear as long as no key is pressed.
+
 
 // Initialize the current pixel position to the start of the screen
 @SCREEN
@@ -34,17 +35,17 @@ M=D
     // Check if we've reached the end of the screen
     @current
     D=M
-    @KBD   //The address of the next address after screen
+    @KBD   // The address of the next address after the screen
     D=D-A
     @LOOP
     D;JGE   // If at the end or beyond, go back to the main loop
 
-    // Set the current pixel to black and move to next pixel
+    // Set the current pixel to black and move to the next pixel
     @current
     A=M
     M=-1    // Set to black
     @current
-    M=M+1   // Move to next pixel
+    M=M+1   // Move to the next pixel
 
     // Go back to the main loop
     @LOOP
@@ -54,14 +55,14 @@ M=D
     // Check if we've reached the start of the screen
     @current
     D=M
-    @16385  // Address after the first screen address
+    @SCREEN  // Address of the first screen address
     D=D-A
     @LOOP
     D;JLE   // If at the start or below, go back to the main loop
 
     // Move to the previous pixel and set it to white
     @current
-    M=M-1   // Move to previous pixel
+    M=M-1   // Move to the previous pixel
     @current
     A=M
     M=0     // Set to white

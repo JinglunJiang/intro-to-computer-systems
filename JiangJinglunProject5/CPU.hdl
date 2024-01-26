@@ -71,3 +71,4 @@ CHIP CPU {
     And(a=instruction[15], b=all, out=loadPC);
     PC(in=outA, inc=true, load=loadPC, reset=reset, out[0..14]=pc);
 }
+
