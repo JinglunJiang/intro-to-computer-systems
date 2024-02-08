@@ -20,6 +20,11 @@ public class VirtualMachineTranslator{
 
   private static int labelCounter = 0;
 
+  /* 
+    Main function that takes in the input file
+    Convert the inputs into a list of strings
+    Call the translateVMtoASM function
+  */
   public static void main(String[] args){
     if (args.length == 0){
       System.err.println("Usage: java VirtualMachineTranslator <input-file>");
@@ -39,6 +44,10 @@ public class VirtualMachineTranslator{
     }
   }
 
+  /*
+    Write a list of strings to the target file
+    Included the expected error handling
+  */
   private static void writeLinesToFile(String fileName, List<String> lines){
     try(FileWriter writer = new FileWriter(fileName)){
       for (String line : lines){
@@ -49,6 +58,11 @@ public class VirtualMachineTranslator{
     }
   }
 
+  /*
+    translateVMtoASM method takes a list of strings from the input file
+    For each of the command, check if it is an arithmetic command or memory access command
+    Write an infinite loop at the end of the file
+  */
   private static List<String> translateVMtoASM(List<String> commands){
     List<String> translatedCommands = new ArrayList<>();
     for (String command : commands){
@@ -69,6 +83,11 @@ public class VirtualMachineTranslator{
     return translatedCommands;
   }
 
+  /*
+    isArithmeticCommand function check command if it is an arithmetic command
+    Input is a string and output is a boolean value
+    If the input command is in any of the reserved arithmetic commands, return true
+  */
   private static boolean isArithmeticCommand(String command){
     for (String cmd : ARITHMETIC_COMMANDS){
       if (cmd.equals(command)){
@@ -78,6 +97,10 @@ public class VirtualMachineTranslator{
     return false;
   }
 
+  /*
+    Check if a given command is a memory-accessing command
+    If the command is in any of the reserved memory accessing command, return true
+  */
   private static boolean isMemoryAccessCommand(String command){
     for (String cmd : MEMORY_ACCESS_COMMANDS){
       if (cmd.equals(command)){
@@ -87,6 +110,9 @@ public class VirtualMachineTranslator{
     return false;
   }
 
+  /*
+    Handles the arithmetic command
+  */
   private static String translateArithmeticCommand(String command){
     StringBuilder asmCode = new StringBuilder();
     switch(command){
@@ -188,6 +214,9 @@ public class VirtualMachineTranslator{
     return asmCode.toString();
   }
 
+  /*
+    A seperate method use to handle push to stack for all the memory accessing method
+  */
   private static String pushDToStack(){
     return "@SP\n" + 
             "A=M\n" +
@@ -196,6 +225,9 @@ public class VirtualMachineTranslator{
             "M=M+1\n";
   }
 
+  /*
+    A mapping method used to return the reserved segments
+  */
   private static String getSegmentPointer(String segment){
     switch (segment){
       case "local":
@@ -211,6 +243,10 @@ public class VirtualMachineTranslator{
     }
   }
 
+  /*
+    translateMamoryAccesssCommand helps to handle the memory access commands
+    Takes in the command by parts
+  */
   private static String translateMemoryAccessCommand(String[] parts){
     StringBuilder asmCode = new StringBuilder();
     String segment = parts[1];
