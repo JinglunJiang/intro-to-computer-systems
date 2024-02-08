@@ -63,6 +63,9 @@ public class VirtualMachineTranslator{
         translatedCommands.add(translateMemoryAccessCommand(parts));
       }
     }
+    translatedCommands.add("(END_LOOP)\n");
+    translatedCommands.add("@END_LOOP\n");
+    translatedCommands.add("0;JMP");
     return translatedCommands;
   }
 
@@ -93,7 +96,7 @@ public class VirtualMachineTranslator{
         asmCode.append("AM=M-1\n");
         asmCode.append("D=M\n");
         asmCode.append("A=A-1\n");
-        asmCpde.append("M=D+M\n");
+        asmCode.append("M=M+D\n");
         break;
       case "sub":
         asmCode.append("// sub\n");
@@ -112,10 +115,11 @@ public class VirtualMachineTranslator{
       case "eq":
         asmCode.append("// eq\n");
         asmCode.append("@SP\n");
-        asmCode.append("AM=M-1");
+        asmCode.append("AM=M-1\n");
         asmCode.append("D=M\n");
         asmCode.append("A=A-1\n");
         asmCode.append("D=M-D\n");
+        asmCode.append("M=-1\n");
         asmCode.append("@EQUAL").append(labelCounter).append("\n");
         asmCode.append("D;JEQ\n");
         asmCode.append("@SP\n");
@@ -137,7 +141,7 @@ public class VirtualMachineTranslator{
         asmCode.append("@SP\n");
         asmCode.append("A=M-1\n");
         asmCode.append("M=0\n");
-        asmCode.append("GREATER_THAN" + labelCounter + "\n");
+        asmCode.append("(GREATER_THAN" + labelCounter + ")\n");
         labelCounter++;
         break;
       case "lt":
@@ -176,7 +180,7 @@ public class VirtualMachineTranslator{
         asmCode.append("// not\n");
         asmCode.append("@SP\n");
         asmCode.append("A=M-1\n");
-        asmCode.append("M!=M\n");
+        asmCode.append("M=!M\n");
         break;
       default:
         break;
@@ -212,7 +216,7 @@ public class VirtualMachineTranslator{
     String segment = parts[1];
     String index = parts[2];
     switch (parts[0]){
-      case "push":
+      case "push":{
         switch(segment){
           case "constant":
             asmCode.append("// push constant ").append(index).append("\n");
@@ -225,24 +229,30 @@ public class VirtualMachineTranslator{
           case "this":
           case "that":
             asmCode.append("// push ").append(segment).append(" ").append(index).append("\n");
-            asmCode.append("@" + index + "\n");
-            asmCode.append("D=A\n");
             asmCode.append("@" + getSegmentPointer(segment) + "\n");
-            asmCode.append("A=D+M\n");
+            asmCode.append("D=M\n");
+            asmCode.append("@" + index + "\n");
+            asmCode.append("A=A+D\n");
             asmCode.append("D=M\n");
             asmCode.append(pushDToStack());
             break;
           case "temp":
             int tempIndex = Integer.parseInt(index);
             asmCode.append("// push temp ").append(tempIndex).append("\n");
-            asmCode.append("@R").append(5 + tempIndex).append("\n");
+            asmCode.append("@5\n");
+            asmCode.append("D=A\n");
+            asmCode.append("@" + index + "\n");
+            asmCode.append("A=A+D\n");
             asmCode.append("D=M\n");
             asmCode.append(pushDToStack());
             break;
           case "static":
             String staticName = parts[0] + "." + index;
             asmCode.append("// push static ").append(index).append("\n");
-            asmCode.append("@" + staticName + "\n");
+            asmCode.append("@").append(segment).append("\n");
+            asmCode.append("D=A\n");
+            asmCode.append("@" + index + "\n");
+            asmCode.append("A=A+D\n");
             asmCode.append("D=M\n");
             asmCode.append(pushDToStack());
             break;
@@ -256,45 +266,58 @@ public class VirtualMachineTranslator{
           default:
             break;
         } 
-      case "pop":
+        break;
+      }
+      case "pop":{
         switch(segment){
           case "local":
           case "argument":
           case "this":
           case "that":
             asmCode.append("// pop ").append(segment).append(" ").append(index).append("\n");
+            asmCode.append("@" + getSegmentPointer(segment) + "\n");
+            asmCode.append("D=M\n");
+            asmCode.append("@").append(index).append("\n");
+            asmCode.append("D=D+A\n");
+            asmCode.append("@13\n");
+            asmCode.append("M=D\n");
             asmCode.append("@SP\n");
             asmCode.append("AM=M-1\n");
             asmCode.append("D=M\n");
-            asmCode.append("@" + index + "\n");
-            asmCode.append("D=A\n");
-            asmCode.append("@" + getSegmentPointer(segment) + "\n");
-            asmCode.append("D=D+M\n");
-            asmCode.append("@R13\n");
-            asmCode.append("M=D\n");
-            asmCode.append("@SP\n");
-            asmCode.append("A=M\n");
-            asmCode.append("D=M\n");
-            asmCode.append("@R13\n");
+            asmCode.append("@13\n");
             asmCode.append("A=M\n");
             asmCode.append("M=D\n");
             break;
           case "temp":
             int tempIndex = Integer.parseInt(index);
             asmCode.append("// pop temp ").append(tempIndex).append("\n");
+            asmCode.append("@5\n");
+            asmCode.append("D=A\n");
+            asmCode.append("@").append(index).append("\n");
+            asmCode.append("D=D+A\n");
+            asmCode.append("@13\n");
+            asmCode.append("M=D\n");
             asmCode.append("@SP\n");
             asmCode.append("AM=M-1\n");
             asmCode.append("D=M\n");
-            asmCode.append("@R").append(5 + tempIndex).append("\n");
+            asmCode.append("@13\n");
+            asmCode.append("A=M\n");
             asmCode.append("M=D\n");
             break;
           case "static":
             String staticName = parts[0] + "." + index;
             asmCode.append("// pop static ").append(index).append("\n");
+            asmCode.append("@").append(segment).append("\n");
+            asmCode.append("D=A\n");
+            asmCode.append("@").append(index).append("\n");
+            asmCode.append("D=D+A\n");
+            asmCode.append("@13\n");
+            asmCode.append("M=D\n");
             asmCode.append("@SP\n");
             asmCode.append("AM=M-1\n");
             asmCode.append("D=M\n");
-            asmCode.append("@" + staticName + "\n");
+            asmCode.append("@13\n");
+            asmCode.append("A=M\n");
             asmCode.append("M=D\n");
             break;
           case "pointer":
@@ -310,6 +333,7 @@ public class VirtualMachineTranslator{
             break;
         }
         break;
+      }
     }
     return asmCode.toString();
   }
