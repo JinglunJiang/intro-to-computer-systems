@@ -81,15 +81,32 @@ public class VirtualMachineTranslator{
       System.err.println("Error reading input file: " + e.getMessage());
     }
   }
-  
-  private static void writeLinesToFile(String fileName, List<String> lines){
-    try(FileWriter writer = new FileWriter(fileName)){
-      for (String line : lines){
-        writer.write(line);
+
+  private static void translateDirectory(File inputFile) {
+      String[] files = inputFile.list((dir, name) -> name.endsWith(".vm"));
+      String parentDirectoryName = inputFile.getName();
+      String parentDirectoryPath = inputFile.getPath();
+
+      String bootstrapCode = generateBoostrapCode();
+      List<String> allTranslatedCommands = new ArrayList<>();
+
+      for (String file : files) {
+          String fileNameWithoutExtension = new File(file).getName().replaceFirst("[.][^.]+$", "");
+
+          try {
+              List<String> commands = Files.readAllLines(Paths.get(parentDirectoryPath, file));
+              List<String> translatedCommands = translateVMtoASM(commands, fileNameWithoutExtension);
+              allTranslatedCommands.addAll(translatedCommands);
+          } catch (IOException e) {
+              System.err.println("Error reading input file: " + e.getMessage());
+          }
       }
-    } catch(IOException e){
-      System.err.println("Error writing to file: " + e.getMessage());
-    }
+
+      allTranslatedCommands.add(0, bootstrapCode);
+
+      String outputFileName = parentDirectoryPath + File.separator + parentDirectoryName + ".asm";
+      writeLinesToFile(outputFileName, allTranslatedCommands);
+      System.out.println("Translation completed. Output file: " + outputFileName);
   }
 
   private static String generateBoostrapCode(){
@@ -137,7 +154,7 @@ public class VirtualMachineTranslator{
         translatedCommands.add(translateArithmeticCommand(parts[0]));
       }
       else if (isMemoryAccessCommand(parts[0])){
-        translatedCommands.add(translateMemoryAccessCommand(parts));
+        translatedCommands.add(translateMemoryAccessCommand(parts, fileName));
       }
       else if (isProgramFlowCommand(parts[0])){
         translatedCommands.add(translateProgramFlowCommand(parts));
@@ -146,9 +163,9 @@ public class VirtualMachineTranslator{
         translatedCommands.add(translateFunctionCallingCommand(parts));
       }
     }
-    translatedCommands.add("(END_LOOP)\n");
-    translatedCommands.add("@END_LOOP\n");
-    translatedCommands.add("0;JMP");
+    // translatedCommands.add("(END_LOOP)\n");
+    // translatedCommands.add("@END_LOOP\n");
+    // translatedCommands.add("0;JMP");
     return translatedCommands;
   }
 
@@ -334,7 +351,7 @@ public class VirtualMachineTranslator{
     translateMamoryAccesssCommand helps to handle the memory access commands
     Takes in the command by parts
   */
-  private static String translateMemoryAccessCommand(String[] parts){
+  private static String translateMemoryAccessCommand(String[] parts, String fileName){
     StringBuilder asmCode = new StringBuilder();
     String segment = parts[1];
     String index = parts[2];
@@ -372,10 +389,7 @@ public class VirtualMachineTranslator{
           case "static":
             String staticName = parts[0] + "." + index;
             asmCode.append("// push static ").append(index).append("\n");
-            asmCode.append("@").append(segment).append("\n");
-            asmCode.append("D=A\n");
-            asmCode.append("@" + index + "\n");
-            asmCode.append("A=A+D\n");
+            asmCode.append("@").append(fileName).append("static").append(index).append("\n");
             asmCode.append("D=M\n");
             asmCode.append(pushDToStack());
             break;
@@ -430,10 +444,8 @@ public class VirtualMachineTranslator{
           case "static":
             String staticName = parts[0] + "." + index;
             asmCode.append("// pop static ").append(index).append("\n");
-            asmCode.append("@").append(segment).append("\n");
+            asmCode.append("@").append(fileName).append(segment).append(index).append("\n");
             asmCode.append("D=A\n");
-            asmCode.append("@").append(index).append("\n");
-            asmCode.append("D=D+A\n");
             asmCode.append("@13\n");
             asmCode.append("M=D\n");
             asmCode.append("@SP\n");
@@ -573,7 +585,7 @@ public class VirtualMachineTranslator{
     //set return address
     asmCode.append("\n// set return address\n");
     asmCode.append("(" + returnAddress + ")\n");
-    asmCode.append("0;JMP\n");
+    //asmCode.append("0;JMP\n");
 
     return asmCode.toString();
   }
