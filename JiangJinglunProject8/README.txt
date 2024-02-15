@@ -7,5 +7,5 @@ javac VirtualMachineTranslator.java
 
 Executution:
 '''
-java VirtualMachineTranslator <file path.vm>
+java VirtualMachineTranslator <file path.vm> / <Directory>
 '''
