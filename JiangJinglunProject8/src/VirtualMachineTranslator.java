@@ -66,6 +66,9 @@ public class VirtualMachineTranslator{
     // }
   }
 
+  /*
+    Translate file logic which translates the file.
+  */
   private static void translateFile(String inputFileName) {
     String outputFileName = inputFileName.replace(".vm", ".asm");
     String fileNameWithoutExtension = new File(inputFileName).getName().replaceFirst("[.][^.]+$", "");
@@ -82,6 +85,9 @@ public class VirtualMachineTranslator{
     }
   }
 
+  /*
+    When the input is directory, direct to the translateDirectory logic.
+  */
   private static void translateDirectory(File inputFile) {
       String[] files = inputFile.list((dir, name) -> name.endsWith(".vm"));
       String parentDirectoryName = inputFile.getName();
@@ -109,6 +115,9 @@ public class VirtualMachineTranslator{
       System.out.println("Translation completed. Output file: " + outputFileName);
   }
 
+  /*
+    The bootstrap code generator
+  */
   private static String generateBoostrapCode(){
     StringBuilder bootstrapCode = new StringBuilder();
     bootstrapCode.append("// Bootstrap code\n");
@@ -513,6 +522,7 @@ public class VirtualMachineTranslator{
     return asmCode.toString();
   }
 
+  
   private static String functionInitialization(String functionName, String numberOfVariable){
     StringBuilder asmCode = new StringBuilder();
     String label = "Initialize" + functionName + numberOfVariable;
