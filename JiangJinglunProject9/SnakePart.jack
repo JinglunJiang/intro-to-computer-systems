@@ -52,8 +52,7 @@ class SnakePart {
 				do Screen.setColor(true);
 				do Screen.drawRectangle(x, y, x + length, y + length);
 			}
-			return true;
-				
+			return true;	
 		}
 		// right
 		if (direction = 4) {
@@ -69,7 +68,7 @@ class SnakePart {
 		
 		return false;
 	}
-	
+
 	method int getDirection() {
 		return direction;
 	}
