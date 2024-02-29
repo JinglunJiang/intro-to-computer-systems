@@ -1,5 +1,6 @@
 import os
-from Analyzer import tokens, Parser
+from Tokenizer import tokens
+from Parser import Parser
 
 def remove_comments(lines):
     without_comments = []
@@ -56,9 +57,9 @@ def process_file(directory, filename, output_folder):
     tokenize_xml_str, tokenize_xml_lst = tokens(jack_code)
     write_to_file(output_txml_path, tokenize_xml_str)
 
-    # parser = Parser(tokenize_xml_lst)
-    # parsed_output = parser.compile_class()
-    # write_to_file(output_xml_path, parsed_output)
+    parser = Parser(tokenize_xml_lst)
+    parsed_output = parser.parse()
+    write_to_file(output_xml_path, parsed_output)
 
 def write_to_file(path, content):
     with open(path, 'w') as f:
