@@ -18,15 +18,15 @@ class Parser:
         self.parse_class()
 
     def tag_start(self, tag):
-        self.output += '    ' * self.indent_level + tag + '\n'
+        self.output += '  ' * self.indent_level + tag + '\n'
         self.indent_level += 1
 
     def tag_end(self, tag):
         self.indent_level -= 1
-        self.output += '    ' * self.indent_level + tag + '\n'
+        self.output += '  ' * self.indent_level + tag + '\n'
 
     def compile_next(self):
-        self.output += '    ' * self.indent_level + self.code_lines[self.current_index]
+        self.output += '  ' * self.indent_level + self.code_lines[self.current_index]
         self.current_index += 1
 
     def is_op(self):
@@ -172,7 +172,7 @@ class Parser:
         self.compile_statements()
         self.compile_next()  # <symbol> } </symbol>
 
-        if "else" in self.code_lines[self.index]:
+        if "else" in self.code_lines[self.current_index]:
             self.compile_next()  # <keyword> else </keyword>
             self.compile_next()  # <symbol> { </symbol>
             self.compile_statements()

@@ -59,7 +59,7 @@ def process_file(directory, filename, output_folder):
 
     parser = Parser(tokenize_xml_lst)
     parsed_output = parser.parse()
-    write_to_file(output_xml_path, parsed_output)
+    write_to_file(output_xml_path, parser.output)
 
 def write_to_file(path, content):
     with open(path, 'w') as f:
