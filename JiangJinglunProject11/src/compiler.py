@@ -20,10 +20,7 @@ def main():
 
     for jackfile in jackfilelist:
         vmfile = jackfile[:-5] + '.vm'
-        compilation_engine.CompilationEngine(
-            jack_tokenizer.JackTokenizer(jackfile),
-            vmfile
-        )
+        compilation_engine.CompilationEngine(jack_tokenizer.JackTokenizer(jackfile), vmfile)
 
 
 if __name__ == '__main__':

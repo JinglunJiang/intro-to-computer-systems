@@ -13,7 +13,6 @@ class SymbolTable():
         self.argument_index_max = -1
         self.var_index_max = -1
 
-    # kindの値について、本来はenum型を使うべきだが手抜きで文字列にしている
     def define(self, name, type, kind):
         if kind == 'static':
             self.static_index_max += 1
@@ -104,7 +103,6 @@ class SymbolTable():
 
         return 0
 
-    # 以下デバッグ用
     def print_cls_symtbl(self):
         print('---------------------------')
         print('<class>\nname\ttype\tkind\tindex')
